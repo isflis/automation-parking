@@ -3,6 +3,9 @@ A simple selenium test example written by python
 """
 
 import unittest
+import logging
+from datetime import datetime
+
 # import numpy as np
 # import cv2
 # import pyautogui
@@ -28,25 +31,23 @@ class TestTemplate(unittest.TestCase):
         """Stop web driver"""
         self.driver.quit()
 
+    def getName(self):
+        now = datetime.now() 
+        name = now.strftime("%H:%M:%S")
+        return name
+
+    def captureImage(self):
+        """Capture Image"""
+        self.driver.save_screenshot("some_file_"+self.getName()+".png")
+
     def test_case_1(self):
-        """Find and click top-left logo button"""
+        """vered"""
         try:
             self.driver.get('https://www.dotprs.nyc/')
+            print("Opened https://www.dotprs.nyc/ /n")
             el = self.driver.find_element_by_class_name('navbar-toggle')
             el.click()
-            self.driver.save_screenshot("some_file.png")
-            # # take screenshot using pyautogui
-            # image = pyautogui.screenshot()
-            
-            # # since the pyautogui takes as a 
-            # # PIL(pillow) and in RGB we need to 
-            # # convert it to numpy array and BGR 
-            # # so we can write it to the disk
-            # image = cv2.cvtColor(np.array(image),
-            #                     cv2.COLOR_RGB2BGR)
-            
-            # # writing it to the disk using opencv
-            # cv2.imwrite("image1.png", image)
+            self.captureImage()
         except NoSuchElementException as ex:
             self.fail(ex.msg)
 
