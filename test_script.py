@@ -4,6 +4,7 @@ A simple selenium test example written by python
 
 import unittest
 import logging
+import threading
 from datetime import datetime
 
 # import numpy as np
@@ -22,7 +23,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-mail_content = '''Try your luck now - https://www.dotprs.nyc/'''
 
 class TestTemplate(unittest.TestCase):
     """Include test cases on a given url"""
@@ -48,15 +48,83 @@ class TestTemplate(unittest.TestCase):
         return name
 
     def clickSimpleAlertOK(self):
-        alert = self.driver.switch_to.alert
-        alert.accept()
-        print("alert accepted")
+        try:
+            alert = self.driver.switch_to.alert
+            alert.accept()
+            print("alert accepted")
+            return True
+        except:
+            print("Couldn't find OK button")
+            return False
 
     def captureImage(self):
         """Capture Image"""
         self.driver.save_screenshot("some_file_"+self.getName()+".png")
 
-    def sendEmail(self):
+    def clickOnCourtYard(self):
+        el2 = self.driver.find_element_by_id('nid-31')
+        el2.click()
+
+    def fillRegistrationForm(self):
+            #Fill in Form:
+        firstName = self.driver.find_element_by_id('edit-field-first-name-und-0-value')
+        firstName.send_keys("Keren")
+
+        lastName = self.driver.find_element_by_id('edit-title')
+        lastName.send_keys("Flis")
+
+        phone = self.driver.find_element_by_id('edit-field-phone-number-und-0-value')
+        phone.send_keys("6072622453")
+
+        email = self.driver.find_element_by_id('edit-field-email-address-und-0-email')
+        email.send_keys("iif3@cornell.edu")
+
+        adress = self.driver.find_element_by_id('edit-field-address-und-0-value')
+        adress.send_keys("24-12 42nd Rd, APT 4C")
+
+        zip = self.driver.find_element_by_id('edit-field-zipcode-und-0-value')
+        zip.send_keys("11101")
+
+        dmv = self.driver.find_element_by_id('edit-field-dmv-number-und-0-value')
+        dmv.send_keys("887991027")
+                
+        self.captureImage()
+
+    def submitForm(self):
+        submitBtn = self.driver.find_element_by_id('edit-submit--2')
+        submitBtn.click()
+
+    def openWebSite(self):
+        web_url ='https://www.w3schools.com/python/python_while_loops.asp' #'https://www.dotprs.nyc/'
+        self.driver.get(web_url)
+        print("Opened " +web_url+" /n")      
+
+    def clickNextBtn(self):
+        self.driver.find_element_by_xpath("//input[@value='Next >']").click()
+
+    def startTask(self):
+        if self.clickSimpleAlertOK():
+            print("Starting Filling Form")
+            self.sendEmail("Starting Filling Registration Form")
+
+            #click start
+            el = self.driver.find_element_by_class_name('form-next')
+            el.click()
+
+            #click on relevat parking:
+            self.clickOnCourtYard()
+            time.sleep(2)
+            self.captureImage()
+
+            # click Next
+            self.clickNextBtn()
+
+            self.fillRegistrationForm()
+            # self.submitForm()
+            # time.sleep(5)
+
+    def sendEmail(self, text):
+        mail_content = text # '''Starting Filling Registration Form for - https://www.dotprs.nyc/'''
         #The mail addresses and password
         sender_address = 'womeninclouds@gmail.com'
         sender_pass = 'Urspkhxurs123'
@@ -78,99 +146,20 @@ class TestTemplate(unittest.TestCase):
         session.quit()
         print('Mail Sent')
 
-    # def test_case_1(self):
-    #     """vered"""
-    #     try:
-    #         web_url = 'https://www.dotprs.nyc/'
-    #         self.driver.get(web_url)
-    #         print("Opened " +web_url+" /n")
-    #         self.captureImage()
-    #         el = self.driver.find_element_by_class_name('navbar-toggle')
-    #         el.click()
-    #         self.captureImage()
-    #         self.sendEmail()
-    #     except NoSuchElementException as ex:
-    #         self.fail(ex.msg)
-
-    # def test_case_2(self):
-    #     """vered"""
-    #     try:
-    #         web_url = 'https://www.tutorialsteacher.com/codeeditor?cid=js-1'
-    #         self.driver.get(web_url)
-    #         print("Opened " +web_url+" /n")
-            
-    #         # Wait for 5 seconds to load the webpage completely
-    #         time.sleep(2)
-    #         # Find the button using text
-    #         # buttons = self.driver.find_element_by_xpath('//button[contains(text(), "Try it")]').click()
-
-    #         self.clickSimpleAlertOK()
-    #         self.clickSimpleAlertOK()
-    #         self.clickSimpleAlertOK()
-    #         self.clickSimpleAlertOK()
-
-    #         self.captureImage()
-    #         self.sendEmail()
-    #     except NoSuchElementException as ex:
-    #         self.fail(ex.msg)
 
     def test_case_3(self):
-        """vered"""
-        try:
-            web_url = 'https://www.dotprs.nyc/'
-            self.driver.get(web_url)
-            print("Opened " +web_url+" /n")
-            
-            # Wait for 5 seconds to load the webpage completely
+        """Starting Parking Automation"""
+        try:  
+            self.openWebSite()
+            # Wait for 2 seconds to load the webpage completely
             time.sleep(2)
-            # Find the button using text
-            # buttons = self.driver.find_element_by_xpath('//button[contains(text(), "Try it")]').click()
-
             # click OK on message:
-            self.clickSimpleAlertOK()
-            #click start
-            el = self.driver.find_element_by_class_name('form-next')
-            el.click()
-            #click on relevat parking:
-            el2 = self.driver.find_element_by_id('nid-31')
-            el2.click()
-            time.sleep(2)
-
-            self.captureImage()
-            # click Next
-            self.driver.find_element_by_xpath("//input[@value='Next >']").click()
-
-            #Fill in Form:
-            firstName = self.driver.find_element_by_id('edit-field-first-name-und-0-value')
-            firstName.send_keys("Keren")
-
-            lastName = self.driver.find_element_by_id('edit-title')
-            lastName.send_keys("Flis")
-
-            phone = self.driver.find_element_by_id('edit-field-phone-number-und-0-value')
-            phone.send_keys("6072622453")
-
-            email = self.driver.find_element_by_id('edit-field-email-address-und-0-email')
-            email.send_keys("iif3@cornell.edu")
-
-            adress = self.driver.find_element_by_id('edit-field-address-und-0-value')
-            adress.send_keys("24-12 42nd Rd, APT 4C")
-
-            zip = self.driver.find_element_by_id('edit-field-zipcode-und-0-value')
-            zip.send_keys("11101")
-
-            dmv = self.driver.find_element_by_id('edit-field-dmv-number-und-0-value')
-            dmv.send_keys("887991027")
-             
-            self.captureImage()
-
-            submitBtn = self.driver.find_element_by_id('edit-submit--2')
-            submitBtn.click()
-
-            time.sleep(5)
-            # self.captureImage()
-
-            # self.sendEmail()
+            while self.clickSimpleAlertOK() == False:
+                print("The registration is closed. Trying in 30sec")
+                time.sleep(30)
+            else:
+                print("The registration is now open")
+                self.startTask()
         except NoSuchElementException as ex:
             self.fail(ex.msg)
 
