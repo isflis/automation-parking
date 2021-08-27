@@ -62,8 +62,14 @@ class TestTemplate(unittest.TestCase):
         self.driver.save_screenshot("some_file_"+self.getName()+".png")
 
     def clickOnCourtYard(self):
-        el2 = self.driver.find_element_by_id('nid-31')
-        el2.click()
+        try:
+            el2 = self.driver.find_element_by_id('nid-31')
+            el2.click()
+            return True
+        except:
+            print("Couldn't click on Court Yard option...")
+            return False
+        
 
     def fillRegistrationForm(self):
             #Fill in Form:
@@ -94,8 +100,8 @@ class TestTemplate(unittest.TestCase):
         submitBtn = self.driver.find_element_by_id('edit-submit--2')
         submitBtn.click()
 
-    def openWebSite(self):
-        web_url ='https://www.w3schools.com/python/python_while_loops.asp' #'https://www.dotprs.nyc/'
+    def openWebSite(self, url):
+        web_url = url 
         self.driver.get(web_url)
         print("Opened " +web_url+" /n")      
 
@@ -103,25 +109,35 @@ class TestTemplate(unittest.TestCase):
         self.driver.find_element_by_xpath("//input[@value='Next >']").click()
 
     def startTask(self):
-        if self.clickSimpleAlertOK():
+        try:
             print("Starting Filling Form")
             self.sendEmail("Starting Filling Registration Form")
 
             #click start
             el = self.driver.find_element_by_class_name('form-next')
             el.click()
-
-            #click on relevat parking:
-            self.clickOnCourtYard()
-            time.sleep(2)
             self.captureImage()
 
-            # click Next
-            self.clickNextBtn()
+            #click on relevat parking:
+            isSpaceLeft = self.clickOnCourtYard()
+            if isSpaceLeft:
+                time.sleep(2)
+                self.captureImage()
 
-            self.fillRegistrationForm()
-            # self.submitForm()
-            # time.sleep(5)
+                # click Next
+                self.clickNextBtn()
+
+                self.fillRegistrationForm()
+                self.submitForm()
+                time.sleep(5)
+                return True
+            else:
+                print("No more space left on Court Yard parking")
+                return False
+            return False
+        except:
+            print("Task Failed")
+            return False
 
     def sendEmail(self, text):
         mail_content = text # '''Starting Filling Registration Form for - https://www.dotprs.nyc/'''
@@ -149,8 +165,10 @@ class TestTemplate(unittest.TestCase):
 
     def test_case_3(self):
         """Starting Parking Automation"""
-        try:  
-            self.openWebSite()
+        # press ctrl+Z to stop the script
+        try:
+            url='https://www.dotprs.nyc/';  
+            self.openWebSite(url)
             # Wait for 2 seconds to load the webpage completely
             time.sleep(2)
             # click OK on message:
@@ -159,7 +177,13 @@ class TestTemplate(unittest.TestCase):
                 time.sleep(30)
             else:
                 print("The registration is now open")
-                self.startTask()
+                isTaskCompleted = self.startTask()
+                if isTaskCompleted:
+                    print("Finished Task")
+                    self.sendEmail("The registration is completed")
+                else:
+                    print("Finished Task")
+                    self.sendEmail("Failed to register")
         except NoSuchElementException as ex:
             self.fail(ex.msg)
 
