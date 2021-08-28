@@ -144,8 +144,7 @@ class TestTemplate(unittest.TestCase):
         #The mail addresses and password
         sender_address = 'womeninclouds@gmail.com'
         sender_pass = 'Urspkhxurs123'
-        #receiver_address = 'iif3@cornell.edu'
-        receiver_address = 'veredflis@gmail.com'
+        receiver_address = 'iif3@cornell.edu'
         #Setup the MIME
         message = MIMEMultipart()
         message['From'] = sender_address
@@ -167,23 +166,26 @@ class TestTemplate(unittest.TestCase):
         """Starting Parking Automation"""
         # press ctrl+Z to stop the script
         try:
-            url='https://www.dotprs.nyc/';  
-            self.openWebSite(url)
-            # Wait for 2 seconds to load the webpage completely
-            time.sleep(2)
-            # click OK on message:
-            while self.clickSimpleAlertOK() == False:
-                print("The registration is closed. Trying in 30sec")
-                time.sleep(30)
-            else:
-                print("The registration is now open")
-                isTaskCompleted = self.startTask()
-                if isTaskCompleted:
-                    print("Finished Task")
-                    self.sendEmail("The registration is completed")
+            while True:
+                url='https://www.dotprs.nyc/';  
+                self.openWebSite(url)
+                # Wait for 2 seconds to load the webpage completely
+                time.sleep(2)
+                # click OK on message:
+                while self.clickSimpleAlertOK() == False:
+                    print("The registration is closed. Trying in 30sec")
+                    time.sleep(30)
+                    # add function to send email at 09:30am
                 else:
-                    print("Finished Task")
-                    self.sendEmail("Failed to register")
+                    print("The registration is now open")
+                    isTaskCompleted = self.startTask()
+                    if isTaskCompleted:
+                        print("Finished Task")
+                        self.sendEmail("The registration is completed")
+                    else:
+                        print("Finished Task")
+                        self.sendEmail("Failed to register")
+                    time.sleep(60*60*23*20)
         except NoSuchElementException as ex:
             self.fail(ex.msg)
 
